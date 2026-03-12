@@ -1,1 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Geist+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SpaceKayak Ops — Andromeda Design System
+   Swiss Editorial Minimalist Aesthetic (from Miniverse/Imagine Fund)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* Brand Colors — Swiss Editorial Minimalist */
+  --color-bg: #F9F8F5;
+  --color-surface: #FFFFFF;
+  --color-text: #1C1C19;
+  --color-text-secondary: #7A7A75;
+  --color-accent: #D94A38;
+  --color-accent-light: #F5E6E3;
+  --color-border: rgba(28, 28, 25, 0.15);
+  --color-border-light: rgba(28, 28, 25, 0.05);
+
+  /* Override Tailwind defaults with Andromeda palette */
+  --color-gray-50: #FAFAF8;
+  --color-gray-100: #F5F5F0;
+  --color-gray-200: #E8E8E3;
+  --color-gray-300: #D4D4CE;
+  --color-gray-400: #A3A39D;
+  --color-gray-500: #7A7A75;
+  --color-gray-600: #525250;
+  --color-gray-700: #40403D;
+  --color-gray-800: #262624;
+  --color-gray-900: #1C1C19;
+  --color-gray-950: #0A0A09;
+
+  /* Type Scale — Restrained, editorial */
+  --text-xs: clamp(0.6rem, 0.6rem + 0.1vw, 0.7rem);
+  --text-sm: clamp(0.75rem, 0.75rem + 0.1vw, 0.85rem);
+  --text-base: clamp(0.9rem, 0.9rem + 0.2vw, 1.05rem);
+  --text-lg: clamp(1.1rem, 1.1rem + 0.3vw, 1.3rem);
+  --text-xl: clamp(1.3rem, 1.3rem + 0.5vw, 1.6rem);
+  --text-2xl: clamp(1.6rem, 1.5rem + 1vw, 2.2rem);
+  --text-3xl: clamp(2.2rem, 2rem + 1.5vw, 3rem);
+
+  /* Font Families */
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
+
+  /* Easing */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Selection */
+::selection {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+/* Base */
+html {
+  scroll-padding-top: 72px;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  font-weight: 400;
+}
+
+/* Custom scrollbar — thin, editorial */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(28, 28, 25, 0.2);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(28, 28, 25, 0.4);
+}
+
+/* ─── Typography Utilities ──────────────────────────────────────────────── */
+.text-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-text-secondary);
+}
+
+.tracking-tight-editorial {
+  letter-spacing: -0.01em;
+}
+
+.tracking-wide-editorial {
+  letter-spacing: 0.15em;
+}
+
+/* ─── Layout Utilities ──────────────────────────────────────────────────── */
+.hairline-b { border-bottom: 1px solid var(--color-border); }
+.hairline-t { border-top: 1px solid var(--color-border); }
+.hairline-l { border-left: 1px solid var(--color-border); }
+.hairline-r { border-right: 1px solid var(--color-border); }
+
+/* ─── Subtle noise texture overlay ──────────────────────────────────────── */
+.noise-overlay::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ─── Row hover — subtle left-shift (editorial interaction) ─────────────── */
+.row-hover {
+  transition: padding-left 0.3s var(--ease-smooth), background-color 0.3s ease;
+}
+.row-hover:hover {
+  padding-left: 4px;
+  background-color: rgba(28, 28, 25, 0.015);
+}
+
+/* ─── Pulsing dot ───────────────────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+.pulse-dot {
+  animation: pulse-dot 3s ease-in-out infinite;
+}
+
+/* ─── Smooth transitions for interactive elements ───────────────────────── */
+button, a, [role="button"] {
+  transition: all 0.15s var(--ease-smooth);
+}
+
+/* ─── Focus ring — accessible + editorial ───────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ─── Reduced motion support ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

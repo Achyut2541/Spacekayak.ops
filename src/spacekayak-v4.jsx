@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { AlertTriangle, Users, DollarSign, MessageSquare, X, Copy, Check, AlertCircle, TrendingUp, Clock, Target, Plus, Edit2, Trash2, CheckCircle, Circle, PlayCircle, List, ChevronDown, Calendar, Home, LayoutDashboard } from 'lucide-react';
 
-// Supabase setup
-const SUPABASE_URL = 'https://prkexjgmqdpeoifznjpv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBya2V4amdtcWRwZW9pZnpuanB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzOTQzNzMsImV4cCI6MjA4Njk3MDM3M30.1ur3I23OgoiVBfHKN-yJuczF1zrv6VMiL_AMlLjPIpQ';
+// Supabase setup — credentials loaded from environment variables
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
 // ── Slack Notifications ───────────────────────────────────────────────────
 // Paste your Slack incoming webhook URL here once you've created the channel.
 // Format: https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/xxxxxxxxxxxxxxxxxxxxxxxx
 // Leave blank to disable — all notification calls silently no-op when empty.
-const SLACK_WEBHOOK_URL = ''; // TODO: add your webhook URL
+const SLACK_WEBHOOK_URL = import.meta.env.VITE_SLACK_WEBHOOK_URL || '';
 
 const sendSlackNotification = async (payload) => {
   if (!SLACK_WEBHOOK_URL) return null; // Not configured yet — skip silently
