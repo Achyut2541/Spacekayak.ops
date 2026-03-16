@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SpaceKayak Ops — Gravity Design System
+   Fermi Ops — Gravity Design System
    Editorial minimal aesthetic · Forest green accent · Warm neutrals
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -220,4 +220,42 @@ button, a, [role="button"] {
 
 @media (max-width: 900px) {
   html { font-size: 13px; }
+}
+
+/* ─── Slide-in animation for toasts & drawers ──────────────────────────── */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+  animation: slide-in 0.25s var(--ease-smooth) forwards;
+}
+
+/* ─── Card hover elevation ─────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.2s var(--ease-smooth), box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ─── View transition fade ─────────────────────────────────────────────── */
+@keyframes view-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.view-enter {
+  animation: view-fade 0.2s ease forwards;
+}
+
+/* ─── Skeleton shimmer ─────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--color-stone-200) 25%, var(--color-stone-100) 50%, var(--color-stone-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

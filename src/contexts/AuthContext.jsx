@@ -54,6 +54,12 @@ export function AuthProvider({ children }) {
     return { error: null, needsConfirmation: !data?.access_token };
   }, []);
 
+  const resetPassword = useCallback(async (email) => {
+    const { error } = await supabaseAuth.recover(email);
+    if (error) return { error };
+    return { success: true };
+  }, []);
+
   const logout = useCallback(async () => {
     if (authToken) await supabaseAuth.signOut(authToken);
     setAuthToken(null);
@@ -67,7 +73,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider value={{
       authToken, isLoggedIn, authChecked,
       currentUser, setCurrentUser,
-      login, signup, logout,
+      login, signup, logout, resetPassword,
     }}>
       {children}
     </AuthContext.Provider>

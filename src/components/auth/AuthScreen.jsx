@@ -3,7 +3,7 @@ import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function AuthScreen() {
-  const { login, signup } = useAuth();
+  const { login, signup, resetPassword } = useAuth();
   const [isSignUpMode, setIsSignUpMode] = useState(false);
 
   // Login state
@@ -18,6 +18,11 @@ export default function AuthScreen() {
   const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
   const [signUpError, setSignUpError] = useState('');
   const [signingUp, setSigningUp] = useState(false);
+
+  // Forgot password state
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
 
   const handleLogin = async () => {
     if (!loginEmail || !loginPassword) return;
@@ -50,24 +55,24 @@ export default function AuthScreen() {
     setSigningUp(false);
   };
 
-  const inputClass = "w-full px-4 py-2.5 text-sm border border-stone-200 rounded-[5px] focus:border-[#2A7A5B] focus:outline-none transition-all bg-white";
+  const inputClass = "w-full px-4 py-2.5 text-sm border border-stone-200 rounded-[5px] focus:border-indigo-500 focus:outline-none transition-all bg-white";
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center font-sans">
       <div className="w-full max-w-[380px]">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-[#2A7A5B] rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-lg font-bold">SK</span>
+          <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-white text-lg font-bold">F</span>
           </div>
-          <h1 className="text-[1.8rem] font-light text-stone-900 font-serif tracking-tight">SpaceKayak Ops</h1>
+          <h1 className="text-[1.8rem] font-light text-stone-900 font-serif tracking-tight">Fermi</h1>
           <p className="text-sm text-stone-400 mt-1 font-mono tracking-wide">
             {isSignUpMode ? 'Create your account' : 'Sign in to your workspace'}
           </p>
         </div>
 
         {/* Mode Toggle */}
-        <div className="flex bg-[#F6F5F2] rounded-[5px] p-1 mb-6 border border-[#E8E5E0]">
+        <div className="flex bg-stone-100 rounded-[5px] p-1 mb-6 border border-stone-200">
           <button
             onClick={() => setIsSignUpMode(false)}
             className={`flex-1 py-2 px-4 text-sm font-medium rounded-[4px] transition-colors ${!isSignUpMode ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-400 hover:text-stone-600'}`}
@@ -83,7 +88,7 @@ export default function AuthScreen() {
         </div>
 
         {/* Form */}
-        <div className="bg-[#F6F5F2] rounded-xl border border-[#E8E5E0] p-8">
+        <div className="bg-stone-100 rounded-xl border border-stone-200 p-8">
           {isSignUpMode ? (
             <div className="space-y-4">
               <div>
@@ -123,7 +128,7 @@ export default function AuthScreen() {
               <button
                 onClick={handleSignUp}
                 disabled={signingUp || !signUpEmail || !signUpPassword || !signUpConfirmPassword}
-                className="w-full py-2.5 px-4 bg-[#2A7A5B] hover:opacity-85 disabled:opacity-40 text-white text-sm font-mono font-medium uppercase tracking-wider rounded-[5px] transition-opacity flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 bg-indigo-600 hover:opacity-85 disabled:opacity-40 text-white text-sm font-mono font-medium uppercase tracking-wider rounded-[5px] transition-opacity flex items-center justify-center gap-2"
               >
                 {signingUp ? (
                   <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Creating account…</>
@@ -160,18 +165,48 @@ export default function AuthScreen() {
               <button
                 onClick={handleLogin}
                 disabled={loggingIn || !loginEmail || !loginPassword}
-                className="w-full py-2.5 px-4 bg-[#2A7A5B] hover:opacity-85 disabled:opacity-40 text-white text-sm font-mono font-medium uppercase tracking-wider rounded-[5px] transition-opacity flex items-center justify-center gap-2"
+                className="w-full py-2.5 px-4 bg-indigo-600 hover:opacity-85 disabled:opacity-40 text-white text-sm font-mono font-medium uppercase tracking-wider rounded-[5px] transition-opacity flex items-center justify-center gap-2"
               >
                 {loggingIn ? (
                   <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Signing in…</>
                 ) : 'Sign in'}
               </button>
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(!showForgotPassword)}
+                className="w-full text-center text-xs text-stone-400 hover:text-indigo-600 mt-3 font-mono transition-colors"
+              >
+                Forgot password?
+              </button>
+              {showForgotPassword && (
+                <div className="mt-3 p-3 bg-white border border-stone-200 rounded-[5px] space-y-2">
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={e => setResetEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className={inputClass}
+                  />
+                  <button
+                    onClick={async () => {
+                      if (!resetEmail) return;
+                      const result = await resetPassword(resetEmail);
+                      setResetMessage(result.error || 'Check your email for a reset link.');
+                    }}
+                    disabled={!resetEmail}
+                    className="w-full py-2 px-4 bg-stone-800 text-white text-sm font-mono font-medium rounded-[5px] hover:opacity-85 disabled:opacity-40 transition-opacity"
+                  >
+                    Send Reset Link
+                  </button>
+                  {resetMessage && <p className="text-xs text-stone-500 font-mono">{resetMessage}</p>}
+                </div>
+              )}
             </div>
           )}
         </div>
 
         <p className="text-center text-xs text-stone-400 mt-6 font-mono tracking-wide">
-          SpaceKayak Operations Center · Internal use only
+          Fermi Operations · Internal use only
         </p>
       </div>
     </div>

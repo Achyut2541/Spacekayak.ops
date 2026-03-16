@@ -5,7 +5,7 @@ export function Avatar({ name, size = 'md', className = '' }) {
     lg: 'w-9 h-9 text-sm',
   };
   return (
-    <div className={`${sizes[size]} bg-[#2A7A5B] rounded-full flex items-center justify-center flex-shrink-0 ${className}`}>
+    <div className={`${sizes[size]} bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 ${className}`}>
       <span className="text-white font-semibold">{name?.[0] || '?'}</span>
     </div>
   );

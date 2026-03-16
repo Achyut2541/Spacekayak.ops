@@ -45,7 +45,7 @@ export default function ProjectsView() {
           )}
         </div>
         <button onClick={() => setShowAddProject(true)}
-          className="bg-[#2A7A5B] text-white px-4 py-2 rounded-[5px] text-sm font-mono font-medium uppercase tracking-wider hover:opacity-85 flex items-center transition-opacity">
+          className="bg-indigo-600 text-white px-4 py-2 rounded-[5px] text-sm font-mono font-medium uppercase tracking-wider hover:opacity-85 flex items-center transition-opacity">
           <Plus className="w-4 h-4 mr-1.5" /> New Project
         </button>
       </div>
@@ -57,7 +57,7 @@ export default function ProjectsView() {
           { label: 'Active Tasks', value: tasks.filter(t => t.status !== 'completed').length, color: 'text-gray-900' },
           { label: 'Delayed', value: delayedCount, color: delayedCount > 0 ? 'text-red-600' : 'text-green-600' },
         ].map(s => (
-          <div key={s.label} className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] p-3">
+          <div key={s.label} className="bg-stone-100 border border-stone-200 rounded-[6px] p-3">
             <div className="gravity-label mb-0.5">{s.label}</div>
             <div className={`text-[1.9rem] font-light font-serif ${s.color}`}>{s.value}</div>
           </div>
@@ -106,7 +106,7 @@ export default function ProjectsView() {
                     <span className="font-semibold text-gray-900">{project.progress}%</span>
                   </div>
                   <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#2A7A5B] transition-all" style={{ width: `${project.progress}%` }} />
+                    <div className="h-full bg-indigo-600 transition-all" style={{ width: `${project.progress}%` }} />
                   </div>
                 </div>
 
@@ -125,7 +125,7 @@ export default function ProjectsView() {
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <button
                     onClick={() => { setSelectedProject(project.id); setActiveTab('tasks'); setTaskFilter('all'); }}
-                    className="px-3 py-1.5 bg-[#2A7A5B] text-white rounded-[5px] text-xs font-mono font-medium hover:opacity-85 transition-opacity"
+                    className="px-3 py-1.5 bg-indigo-600 text-white rounded-[5px] text-xs font-mono font-medium hover:opacity-85 transition-opacity"
                   >
                     Tasks
                   </button>

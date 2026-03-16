@@ -1,9 +1,20 @@
 import { useState } from 'react';
-import { LayoutDashboard, AlertCircle, Check, CheckCircle, ChevronDown, Edit2 } from 'lucide-react';
+import { LayoutDashboard, Check, CheckCircle } from 'lucide-react';
 import { useUI } from '../../contexts/UIContext';
 import { useData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fmtShort } from '../../lib/utils';
+import DashboardStats from './DashboardStats';
+import AttentionBanner from './AttentionBanner';
+import ProjectCard from './ProjectCard';
+
+const phaseColors = {
+  'Kickoff': 'bg-purple-100 text-purple-700', 'Discovery': 'bg-indigo-100 text-indigo-700',
+  'Strategy': 'bg-cyan-100 text-cyan-700', 'Branding': 'bg-pink-100 text-pink-700',
+  'Design': 'bg-indigo-100 text-indigo-700', 'Development': 'bg-green-100 text-green-700',
+  'QA': 'bg-teal-100 text-teal-700', 'Final Delivery': 'bg-emerald-100 text-emerald-700',
+  'Complete': 'bg-gray-100 text-gray-700',
+};
 
 export default function DashboardView() {
   const {
@@ -23,14 +34,6 @@ export default function DashboardView() {
   const today = new Date();
   const hour = today.getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-
-  const phaseColors = {
-    'Kickoff': 'bg-purple-100 text-purple-700', 'Discovery': 'bg-indigo-100 text-indigo-700',
-    'Strategy': 'bg-cyan-100 text-cyan-700', 'Branding': 'bg-pink-100 text-pink-700',
-    'Design': 'bg-indigo-100 text-indigo-700', 'Development': 'bg-green-100 text-green-700',
-    'QA': 'bg-teal-100 text-teal-700', 'Final Delivery': 'bg-emerald-100 text-emerald-700',
-    'Complete': 'bg-gray-100 text-gray-700',
-  };
 
   const getProjectHealth = (project) => {
     const pTasks = tasksWithStatus.filter(t => t.projectId === project.id);
@@ -105,6 +108,13 @@ export default function DashboardView() {
       return h.label === 'At Risk' || h.label === 'Watch';
     });
 
+    const statsData = [
+      { label: 'Active Projects', value: myProjects.filter(p => !p.archived).length, sub: atRiskProjects.length > 0 ? `${atRiskProjects.length} need attention` : 'All looking good', valueColor: 'text-gray-900', subColor: atRiskProjects.length > 0 ? 'text-orange-600' : 'text-green-600' },
+      { label: 'Overdue Tasks', value: overdueTasks.length, sub: overdueTasks.length > 0 ? 'Need immediate action' : 'All on schedule', valueColor: overdueTasks.length > 0 ? 'text-red-600' : 'text-gray-900', subColor: overdueTasks.length > 0 ? 'text-red-500' : 'text-green-600' },
+      { label: 'Due This Week', value: thisWeekTasks.length, sub: 'Upcoming deadlines', valueColor: 'text-gray-900', subColor: 'text-gray-500' },
+      { label: 'Team Overloaded', value: overloadedMembers.length, sub: overloadedMembers.length > 0 ? overloadedMembers.slice(0, 2).map(m => m.name).join(', ') : 'Everyone in good shape', valueColor: overloadedMembers.length > 0 ? 'text-orange-600' : 'text-gray-900', subColor: overloadedMembers.length > 0 ? 'text-orange-500' : 'text-green-600' },
+    ];
+
     return (
       <div className="space-y-6">
         <div className="flex items-start justify-between">
@@ -129,56 +139,14 @@ export default function DashboardView() {
           </div>
         </div>
 
-        {/* Quick Snapshot */}
-        <div className="grid grid-cols-4 gap-3">
-          {[
-            { label: 'Active Projects', value: myProjects.filter(p => !p.archived).length, sub: atRiskProjects.length > 0 ? `${atRiskProjects.length} need attention` : 'All looking good', valueColor: 'text-gray-900', subColor: atRiskProjects.length > 0 ? 'text-orange-600' : 'text-green-600' },
-            { label: 'Overdue Tasks', value: overdueTasks.length, sub: overdueTasks.length > 0 ? 'Need immediate action' : 'All on schedule', valueColor: overdueTasks.length > 0 ? 'text-red-600' : 'text-gray-900', subColor: overdueTasks.length > 0 ? 'text-red-500' : 'text-green-600' },
-            { label: 'Due This Week', value: thisWeekTasks.length, sub: 'Upcoming deadlines', valueColor: 'text-gray-900', subColor: 'text-gray-500' },
-            { label: 'Team Overloaded', value: overloadedMembers.length, sub: overloadedMembers.length > 0 ? overloadedMembers.slice(0, 2).map(m => m.name).join(', ') : 'Everyone in good shape', valueColor: overloadedMembers.length > 0 ? 'text-orange-600' : 'text-gray-900', subColor: overloadedMembers.length > 0 ? 'text-orange-500' : 'text-green-600' },
-          ].map(s => (
-            <div key={s.label} className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] p-4 hover:-translate-y-px transition-transform">
-              <div className="gravity-label mb-2">{s.label}</div>
-              <div className={`text-[1.9rem] font-light font-serif mb-1 ${s.valueColor}`}>{s.value}</div>
-              <div className={`text-xs font-mono ${s.subColor}`}>{s.sub}</div>
-            </div>
-          ))}
-        </div>
+        <DashboardStats stats={statsData} />
 
-        {/* Needs Attention */}
-        {(overdueTasks.length > 0 || overloadedMembers.length > 0) && (
-          <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertCircle className="w-4 h-4 text-amber-600" />
-              <span className="text-sm font-bold text-amber-900">Needs Attention</span>
-            </div>
-            <div className="space-y-2">
-              {overdueTasks.slice(0, 3).map(task => {
-                const proj = projects.find(p => p.id === task.projectId);
-                return (
-                  <div key={task.id} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0" />
-                      <span className="font-medium text-gray-900">{task.title}</span>
-                      {proj && <span className="text-gray-500">— {proj.name}</span>}
-                    </div>
-                    <span className="text-xs text-gray-500 font-mono">
-                      {Array.isArray(task.assignedTo) ? task.assignedTo.join(', ') : task.assignedTo}
-                    </span>
-                  </div>
-                );
-              })}
-              {overdueTasks.length > 3 && <div className="text-xs text-amber-700 font-medium font-mono">+{overdueTasks.length - 3} more overdue</div>}
-              {overloadedMembers.slice(0, 2).map(m => (
-                <div key={m.name} className="flex items-center gap-2 text-sm">
-                  <span className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0" />
-                  <span className="font-medium text-gray-900">{m.name}</span>
-                  <span className="text-gray-500 font-mono">overloaded — {m.activeTasks} tasks ({capacityPct(m)}% capacity)</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <AttentionBanner
+          overdueTasks={overdueTasks}
+          overloadedMembers={overloadedMembers}
+          projects={projects}
+          capacityPct={capacityPct}
+        />
 
         {/* Portfolio Health */}
         <div>
@@ -187,7 +155,7 @@ export default function DashboardView() {
             <span className="text-xs text-gray-400 font-mono">{myProjects.length} {myProjects.length === 1 ? 'project' : 'projects'}</span>
           </div>
           {myProjects.length === 0 ? (
-            <div className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] p-10 text-center text-gray-400">
+            <div className="bg-stone-100 border border-stone-200 rounded-[6px] p-10 text-center text-gray-400">
               <LayoutDashboard className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p className="text-sm">No active projects</p>
             </div>
@@ -200,122 +168,32 @@ export default function DashboardView() {
                 const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
                 const health = getProjectHealth(project);
                 const daysLeft = Math.ceil((new Date(project.decidedEndDate || project.endDate) - today) / 86400000);
-                const isExpanded = expandedProjects.includes(project.id);
                 const currentTask = activeTasks.find(t => t.status === 'in-progress') || activeTasks.find(t => t.status === 'next-in-line') || activeTasks[0];
                 const upcomingTasks = activeTasks.filter(t => t.id !== currentTask?.id).slice(0, 3);
 
                 return (
-                  <div key={project.id} className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] overflow-hidden hover:-translate-y-px transition-transform">
-                    <div className="p-4 cursor-pointer hover:bg-[#EFEDE8] transition-colors" onClick={() => toggleExpandProject(project.id)}>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${health.dot}`} />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="text-sm font-semibold text-gray-900 truncate">{project.name}</h3>
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-mono font-medium flex-shrink-0 ${phaseColors[project.phase] || 'bg-gray-100 text-gray-700'}`}>{project.phase}</span>
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-mono font-medium flex-shrink-0 ${health.color}`}>{health.label}</span>
-                            </div>
-                            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 font-mono">
-                              <span>{project.type}</span>
-                              <span>{completedCount}/{totalCount} tasks</span>
-                              {project.team?.am && <span>AM: {project.team.am}</span>}
-                              {daysLeft >= 0
-                                ? <span className={daysLeft <= 7 ? 'text-orange-600 font-medium' : ''}>{daysLeft}d left</span>
-                                : <span className="text-red-600 font-medium">{Math.abs(daysLeft)}d overdue</span>}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-                          <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#2A7A5B] rounded-full" style={{ width: `${progressPct}%` }} />
-                          </div>
-                          <span className="text-xs text-gray-500 w-8 text-right font-mono">{progressPct}%</span>
-                          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                        </div>
-                      </div>
-                    </div>
-
-                    {isExpanded && (
-                      <div className="border-t border-[#E8E5E0]">
-                        <div className="px-4 py-2 flex items-center gap-2 bg-[#EFEDE8] border-b border-[#E8E5E0]">
-                          <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-[#2A7A5B] rounded-full" style={{ width: `${progressPct}%` }} />
-                          </div>
-                          <span className="text-xs text-gray-600 font-mono font-medium">{progressPct}%</span>
-                          {canEditProjects(currentUser) && (
-                            <>
-                              <button onClick={e => { e.stopPropagation(); setEditingProject(project); }} className="p-1.5 hover:bg-gray-200 rounded transition-colors ml-2" title="Edit">
-                                <Edit2 className="w-3.5 h-3.5 text-gray-500" />
-                              </button>
-                              <button
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  if (window.confirm(`${project.archived ? 'Unarchive' : 'Archive'} this project?`)) {
-                                    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, archived: !p.archived } : p));
-                                  }
-                                }}
-                                className="p-1.5 hover:bg-gray-200 rounded transition-colors" title={project.archived ? 'Unarchive' : 'Archive'}>
-                                <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                </svg>
-                              </button>
-                            </>
-                          )}
-                        </div>
-
-                        {currentTask && (
-                          <div className="p-4 bg-indigo-50 border-b border-indigo-100">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-2 h-2 bg-[#2A7A5B] rounded-full animate-pulse" />
-                              <span className="gravity-label">Current Task</span>
-                            </div>
-                            <div className="flex items-start gap-3">
-                              <button onClick={() => completeTask(currentTask.id, project.id)}
-                                className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 border-[#2A7A5B] hover:bg-[#2A7A5B] transition-all group flex items-center justify-center">
-                                <Check className="w-3 h-3 text-transparent group-hover:text-white transition-colors" />
-                              </button>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-sm text-gray-900">{currentTask.title}</div>
-                                <div className="flex items-center gap-2 mt-1 text-xs text-gray-500 flex-wrap font-mono">
-                                  {currentTask.assignedTo?.length > 0 && <span>{(Array.isArray(currentTask.assignedTo) ? currentTask.assignedTo : [currentTask.assignedTo]).join(', ')}</span>}
-                                  <span>Due {fmtShort(currentTask.dueDate)}</span>
-                                  {currentTask.estimatedHours && <span>{currentTask.estimatedHours}h</span>}
-                                  <span className={`px-2 py-0.5 rounded-full font-medium ${currentTask.priority === 'critical' ? 'bg-red-100 text-red-700' : currentTask.priority === 'high' ? 'bg-orange-100 text-orange-700' : currentTask.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'}`}>
-                                    {currentTask.priority?.toUpperCase()}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {upcomingTasks.length > 0 && (
-                          <div className="p-4">
-                            <div className="gravity-label mb-2">Up Next</div>
-                            <div className="space-y-1.5">
-                              {upcomingTasks.map(task => (
-                                <div key={task.id} className="flex items-center gap-2 text-sm">
-                                  <div className="w-1.5 h-1.5 bg-gray-300 rounded-full flex-shrink-0" />
-                                  <span className="flex-1 text-gray-700 truncate">{task.title}</span>
-                                  <span className="text-xs text-gray-400 flex-shrink-0 font-mono">{fmtShort(task.dueDate)}</span>
-                                </div>
-                              ))}
-                              {activeTasks.length > upcomingTasks.length + 1 && (
-                                <div className="text-xs text-gray-400 font-mono">+{activeTasks.length - upcomingTasks.length - 1} more tasks</div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        {activeTasks.length === 0 && (
-                          <div className="p-4 text-center text-sm text-gray-500">
-                            <CheckCircle className="w-5 h-5 mx-auto mb-1 text-green-500" />
-                            All tasks complete!
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    health={health}
+                    progressPct={progressPct}
+                    completedCount={completedCount}
+                    totalCount={totalCount}
+                    activeTasks={activeTasks}
+                    currentTask={currentTask}
+                    upcomingTasks={upcomingTasks}
+                    daysLeft={daysLeft}
+                    isExpanded={expandedProjects.includes(project.id)}
+                    onToggle={() => toggleExpandProject(project.id)}
+                    onCompleteTask={(taskId) => completeTask(taskId, project.id)}
+                    onEdit={() => setEditingProject(project)}
+                    onArchive={() => {
+                      if (window.confirm(`${project.archived ? 'Unarchive' : 'Archive'} this project?`)) {
+                        setProjects(prev => prev.map(p => p.id === project.id ? { ...p, archived: !p.archived } : p));
+                      }
+                    }}
+                    canEdit={canEditProjects(currentUser)}
+                  />
                 );
               })}
             </div>
@@ -353,7 +231,7 @@ export default function DashboardView() {
           <span className="text-xs text-gray-400 font-mono">{myActiveTasks.length} tasks</span>
         </div>
         {myActiveTasks.length === 0 ? (
-          <div className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] p-8 text-center">
+          <div className="bg-stone-100 border border-stone-200 rounded-[6px] p-8 text-center">
             <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-400" />
             <p className="text-sm font-medium text-gray-700">You're all caught up!</p>
             <p className="text-xs text-gray-400 mt-1 font-mono">No active tasks right now</p>
@@ -363,10 +241,10 @@ export default function DashboardView() {
             {myActiveTasks.map(task => {
               const proj = projects.find(p => p.id === task.projectId);
               return (
-                <div key={task.id} className={`bg-[#F6F5F2] border rounded-[6px] p-4 hover:-translate-y-px transition-transform ${task.status === 'delayed' ? 'border-red-200 bg-red-50' : task.status === 'in-progress' ? 'border-indigo-200' : 'border-[#E8E5E0]'}`}>
+                <div key={task.id} className={`bg-stone-100 border rounded-[6px] p-4 hover:-translate-y-px transition-transform ${task.status === 'delayed' ? 'border-red-200 bg-red-50' : task.status === 'in-progress' ? 'border-indigo-200' : 'border-stone-200'}`}>
                   <div className="flex items-start gap-3">
                     <button onClick={() => completeTask(task.id, task.projectId)}
-                      className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all group flex items-center justify-center ${task.status === 'in-progress' ? 'border-[#2A7A5B] hover:bg-[#2A7A5B]' : task.status === 'delayed' ? 'border-red-500 hover:bg-red-500' : 'border-gray-400 hover:bg-gray-400'}`}
+                      className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border-2 transition-all group flex items-center justify-center ${task.status === 'in-progress' ? 'border-indigo-600 hover:bg-indigo-600' : task.status === 'delayed' ? 'border-red-500 hover:bg-red-500' : 'border-gray-400 hover:bg-gray-400'}`}
                       title="Mark complete">
                       <Check className="w-3 h-3 text-transparent group-hover:text-white transition-colors" />
                     </button>
@@ -410,7 +288,7 @@ export default function DashboardView() {
             <h3 className="text-lg font-light text-gray-900 font-serif">Due This Week</h3>
             <span className="text-xs text-gray-400 font-mono">{myThisWeek.length} tasks</span>
           </div>
-          <div className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] divide-y divide-[#E8E5E0]">
+          <div className="bg-stone-100 border border-stone-200 rounded-[6px] divide-y divide-stone-200">
             {myThisWeek.map(task => {
               const proj = projects.find(p => p.id === task.projectId);
               const daysLeft = Math.ceil((new Date(task.dueDate) - today) / 86400000);
@@ -436,7 +314,7 @@ export default function DashboardView() {
           <span className="text-xs text-gray-400 font-mono">{myProjects.length} projects</span>
         </div>
         {myProjects.length === 0 ? (
-          <div className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] p-8 text-center text-gray-400">
+          <div className="bg-stone-100 border border-stone-200 rounded-[6px] p-8 text-center text-gray-400">
             <LayoutDashboard className="w-8 h-8 mx-auto mb-2 opacity-40" />
             <p className="text-sm">No projects assigned yet</p>
           </div>
@@ -448,7 +326,7 @@ export default function DashboardView() {
               const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
               const health = getProjectHealth(project);
               return (
-                <div key={project.id} className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] p-4 flex items-center gap-4 hover:-translate-y-px transition-transform">
+                <div key={project.id} className="bg-stone-100 border border-stone-200 rounded-[6px] p-4 flex items-center gap-4 hover:-translate-y-px transition-transform">
                   <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${health.dot}`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -462,7 +340,7 @@ export default function DashboardView() {
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#2A7A5B] rounded-full" style={{ width: `${progressPct}%` }} />
+                      <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${progressPct}%` }} />
                     </div>
                     <span className="text-xs text-gray-500 w-8 font-mono">{progressPct}%</span>
                   </div>

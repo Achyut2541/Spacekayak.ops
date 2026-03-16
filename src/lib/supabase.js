@@ -46,6 +46,20 @@ export const supabaseAuth = {
     }
   },
 
+  recover: async (email) => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) return { error: 'Failed to send reset email' };
+      return { error: null };
+    } catch {
+      return { error: 'Network error — could not reach auth server' };
+    }
+  },
+
   signUp: async (email, password) => {
     try {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {

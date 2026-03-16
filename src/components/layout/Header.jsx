@@ -1,10 +1,10 @@
-import { X, ChevronDown, AlertCircle } from 'lucide-react';
+import { X, ChevronDown, AlertCircle, Menu } from 'lucide-react';
 import { useUI } from '../../contexts/UIContext';
 import { useData } from '../../contexts/DataContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Avatar } from '../ui';
 
-export default function Header() {
+export default function Header({ onMenuToggle }) {
   const { searchQuery, setSearchQuery, viewingAs, setViewingAs } = useUI();
   const { slackToast, accountManagers, allTeamNames, getUserRole, canViewAs } = useData();
   const { currentUser, setCurrentUser, logout } = useAuth();
@@ -13,13 +13,20 @@ export default function Header() {
     <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-200/60">
       <div className="max-w-[1400px] mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
+          {/* Mobile menu button */}
+          {onMenuToggle && (
+            <button onClick={onMenuToggle} className="lg:hidden p-1.5 hover:bg-stone-100 rounded-lg mr-2">
+              <Menu className="w-5 h-5 text-stone-600" />
+            </button>
+          )}
+
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#2A7A5B] rounded-lg flex items-center justify-center">
-              <span className="text-white text-xs font-black tracking-tight">SK</span>
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <span className="text-white text-xs font-black tracking-tight">F</span>
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-stone-900 tracking-tight">SpaceKayak Operations</h1>
+              <h1 className="text-sm font-semibold text-stone-900 tracking-tight">Fermi</h1>
               {viewingAs && (
                 <div className="text-xs text-orange-600 font-medium font-mono">
                   Viewing as {viewingAs} ·{' '}
@@ -30,7 +37,7 @@ export default function Header() {
           </div>
 
           {/* Search */}
-          <div className="flex-1 max-w-md mx-8">
+          <div className="hidden sm:block flex-1 max-w-md mx-8">
             <div className="relative">
               <input
                 type="text"
@@ -54,7 +61,7 @@ export default function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            <div className="text-xs text-stone-400 font-mono font-medium tabular-nums tracking-wide">
+            <div className="hidden sm:block text-xs text-stone-400 font-mono font-medium tabular-nums tracking-wide">
               {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
             </div>
 

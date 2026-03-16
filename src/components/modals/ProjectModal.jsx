@@ -245,7 +245,7 @@ export default function ProjectModal({
         <div className="flex gap-3 mt-4 pt-4 border-t border-gray-200">
           <button onClick={onSave}
             disabled={!data.name || !data.type || !data.startDate || !data.decidedEndDate || !data.team?.am}
-            className="flex-1 bg-[#2A7A5B] text-white py-2.5 rounded-[5px] text-sm font-mono font-medium uppercase tracking-wider hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+            className="flex-1 bg-indigo-600 text-white py-2.5 rounded-[5px] text-sm font-mono font-medium uppercase tracking-wider hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
             Save Project
           </button>
           <button onClick={onCancel}

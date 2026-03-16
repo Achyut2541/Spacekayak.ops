@@ -3,6 +3,7 @@ import { DataProvider } from './contexts/DataContext';
 import { UIProvider, useUI } from './contexts/UIContext';
 import AppShell from './components/layout/AppShell';
 import AuthScreen from './components/auth/AuthScreen';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import DashboardView from './components/dashboard/DashboardView';
 import ProjectsView from './components/projects/ProjectsView';
 import TasksView from './components/tasks/TasksView';
@@ -11,6 +12,7 @@ import TimelineView from './components/timeline/TimelineView';
 import RiskView from './components/risk/RiskView';
 import CrisisView from './components/crisis/CrisisView';
 import TeamView from './components/team/TeamView';
+import SettingsView from './components/settings/SettingsView';
 
 function TabRouter() {
   const { activeTab } = useUI();
@@ -24,6 +26,7 @@ function TabRouter() {
     case 'risk': return <RiskView />;
     case 'crisis': return <CrisisView />;
     case 'team': return <TeamView />;
+    case 'settings': return <SettingsView />;
     default: return <DashboardView />;
   }
 }
@@ -45,7 +48,9 @@ function AuthGate() {
     <DataProvider>
       <UIProvider>
         <AppShell>
-          <TabRouter />
+          <ErrorBoundary>
+            <TabRouter />
+          </ErrorBoundary>
         </AppShell>
       </UIProvider>
     </DataProvider>

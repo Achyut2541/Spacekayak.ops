@@ -43,13 +43,13 @@ export default function TasksView() {
           )}
         </div>
         <button onClick={() => setShowAddTask(true)}
-          className="bg-[#2A7A5B] text-white px-4 py-2 rounded-[5px] font-mono font-medium uppercase tracking-wider hover:opacity-85 flex items-center shadow-md">
+          className="bg-indigo-600 text-white px-4 py-2 rounded-[5px] font-mono font-medium uppercase tracking-wider hover:opacity-85 flex items-center shadow-md">
           <Plus className="w-4 h-4 mr-2" /> New Task
         </button>
       </div>
 
       {/* Filter bar */}
-      <div className="bg-[#F6F5F2] border border-[#E8E5E0] rounded-[6px] p-4 flex flex-wrap gap-2">
+      <div className="bg-stone-100 border border-stone-200 rounded-[6px] p-4 flex flex-wrap gap-2">
         <button onClick={() => setTaskFilter('all')}
           className={`px-4 py-1.5 rounded-lg font-bold text-sm ${taskFilter === 'all' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
           All ({list.length})
@@ -266,7 +266,7 @@ export default function TasksView() {
             <div className="flex gap-3 mt-6">
               <button onClick={handleAddTask}
                 disabled={!newTask.projectId || !newTask.title?.trim() || !newTask.assignedTo?.length || !newTask.dueDate}
-                className="flex-1 bg-[#2A7A5B] text-white py-3 rounded-[5px] font-mono font-medium uppercase tracking-wider hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+                className="flex-1 bg-indigo-600 text-white py-3 rounded-[5px] font-mono font-medium uppercase tracking-wider hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
                 Add Task
               </button>
               <button onClick={() => { setShowAddTask(false); setNewTask({ ...EMPTY_TASK }); }}

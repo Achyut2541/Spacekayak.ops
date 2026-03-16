@@ -83,7 +83,7 @@ export default function TeamView() {
         </div>
         <button
           onClick={() => setShowAddMember(true)}
-          className="flex items-center gap-2 bg-[#2A7A5B] text-white px-4 py-2 rounded-[5px] text-sm font-mono font-medium uppercase tracking-wider hover:opacity-85 transition-colors"
+          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-[5px] text-sm font-mono font-medium uppercase tracking-wider hover:opacity-85 transition-colors"
         >
           <Plus className="w-4 h-4" /> Add Member
         </button>
@@ -194,7 +194,7 @@ export default function TeamView() {
             <div className="p-6 border-t border-gray-100 flex items-center justify-end gap-3">
               <button onClick={closeMemberModal} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
               <button onClick={saveMember} disabled={!newMember.name.trim() || !newMember.role.trim()}
-                className="px-4 py-2 text-sm font-mono font-medium uppercase tracking-wider bg-[#2A7A5B] text-white rounded-[5px] hover:opacity-85 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">
+                className="px-4 py-2 text-sm font-mono font-medium uppercase tracking-wider bg-indigo-600 text-white rounded-[5px] hover:opacity-85 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">
                 {editingMember ? 'Save Changes' : 'Add Member'}
               </button>
             </div>
