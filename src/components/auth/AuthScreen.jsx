@@ -96,7 +96,7 @@ export default function AuthScreen() {
                 <input
                   type="email" value={signUpEmail} onChange={e => setSignUpEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && signUpPassword && signUpConfirmPassword && handleSignUp()}
-                  placeholder="you@spacekayak.xyz"
+                  placeholder="you@fermi.ops"
                   className={inputClass}
                   autoFocus
                 />
@@ -142,7 +142,7 @@ export default function AuthScreen() {
                 <input
                   type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                  placeholder="you@spacekayak.xyz"
+                  placeholder="you@fermi.ops"
                   className={inputClass}
                   autoFocus
                 />
