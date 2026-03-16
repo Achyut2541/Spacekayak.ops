@@ -1,48 +1,92 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Geist+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SpaceKayak Ops — Andromeda Design System
-   Swiss Editorial Minimalist Aesthetic (from Miniverse/Imagine Fund)
+   SpaceKayak Ops — Gravity Design System
+   Editorial minimal aesthetic · Forest green accent · Warm neutrals
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* Brand Colors — Swiss Editorial Minimalist */
-  --color-bg: #F9F8F5;
-  --color-surface: #FFFFFF;
-  --color-text: #1C1C19;
-  --color-text-secondary: #7A7A75;
-  --color-accent: #D94A38;
-  --color-accent-light: #F5E6E3;
-  --color-border: rgba(28, 28, 25, 0.15);
-  --color-border-light: rgba(28, 28, 25, 0.05);
+  /* Brand Colors — Gravity Palette */
+  --color-bg: #FFFFFF;
+  --color-surface: #F6F5F2;
+  --color-card: #F6F5F2;
+  --color-card-hover: #EFEDE8;
+  --color-text: #111114;
+  --color-text-secondary: #888;
+  --color-text-faint: #aaa;
+  --color-accent: #2A7A5B;
+  --color-accent-light: #E8F5EE;
+  --color-accent-dim: #E8F5EE;
+  --color-border: #E8E5E0;
+  --color-border-light: #D8D5D0;
 
-  /* Override Tailwind defaults with Andromeda palette */
+  /* Override Tailwind indigo → Gravity green */
+  --color-indigo-50: #E8F5EE;
+  --color-indigo-100: #D1EBE0;
+  --color-indigo-200: #A3D7C1;
+  --color-indigo-300: #75C3A2;
+  --color-indigo-400: #3DA87A;
+  --color-indigo-500: #2A7A5B;
+  --color-indigo-600: #2A7A5B;
+  --color-indigo-700: #1F5F46;
+  --color-indigo-800: #164536;
+  --color-indigo-900: #0D2B22;
+  --color-indigo-950: #071A14;
+
+  /* Override Tailwind teal → Gravity green (unified accent) */
+  --color-teal-50: #E8F5EE;
+  --color-teal-100: #D1EBE0;
+  --color-teal-200: #A3D7C1;
+  --color-teal-300: #75C3A2;
+  --color-teal-400: #3DA87A;
+  --color-teal-500: #2A7A5B;
+  --color-teal-600: #2A7A5B;
+  --color-teal-700: #1F5F46;
+  --color-teal-800: #164536;
+  --color-teal-900: #0D2B22;
+
+  /* Warm gray override */
   --color-gray-50: #FAFAF8;
-  --color-gray-100: #F5F5F0;
-  --color-gray-200: #E8E8E3;
-  --color-gray-300: #D4D4CE;
+  --color-gray-100: #F6F5F2;
+  --color-gray-200: #E8E5E0;
+  --color-gray-300: #D8D5D0;
   --color-gray-400: #A3A39D;
-  --color-gray-500: #7A7A75;
+  --color-gray-500: #888;
   --color-gray-600: #525250;
   --color-gray-700: #40403D;
   --color-gray-800: #262624;
-  --color-gray-900: #1C1C19;
+  --color-gray-900: #111114;
   --color-gray-950: #0A0A09;
 
-  /* Type Scale — Restrained, editorial */
-  --text-xs: clamp(0.6rem, 0.6rem + 0.1vw, 0.7rem);
-  --text-sm: clamp(0.75rem, 0.75rem + 0.1vw, 0.85rem);
-  --text-base: clamp(0.9rem, 0.9rem + 0.2vw, 1.05rem);
-  --text-lg: clamp(1.1rem, 1.1rem + 0.3vw, 1.3rem);
-  --text-xl: clamp(1.3rem, 1.3rem + 0.5vw, 1.6rem);
-  --text-2xl: clamp(1.6rem, 1.5rem + 1vw, 2.2rem);
-  --text-3xl: clamp(2.2rem, 2rem + 1.5vw, 3rem);
+  /* Stone → warm neutral */
+  --color-stone-50: #FAFAF8;
+  --color-stone-100: #F6F5F2;
+  --color-stone-200: #E8E5E0;
+  --color-stone-300: #D8D5D0;
+  --color-stone-400: #A3A39D;
+  --color-stone-500: #888;
+  --color-stone-600: #525250;
+  --color-stone-700: #40403D;
+  --color-stone-800: #262624;
+  --color-stone-900: #111114;
+  --color-stone-950: #0A0A09;
 
-  /* Font Families */
-  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
+  /* Type Scale — Restrained, editorial */
+  --text-xs: clamp(0.56rem, 0.56rem + 0.1vw, 0.66rem);
+  --text-sm: clamp(0.72rem, 0.72rem + 0.1vw, 0.82rem);
+  --text-base: clamp(0.85rem, 0.85rem + 0.2vw, 1rem);
+  --text-lg: clamp(1.1rem, 1.1rem + 0.3vw, 1.3rem);
+  --text-xl: clamp(1.3rem, 1.3rem + 0.4vw, 1.6rem);
+  --text-2xl: clamp(1.6rem, 1.5rem + 0.8vw, 2rem);
+  --text-3xl: clamp(2rem, 1.8rem + 1.2vw, 2.6rem);
+
+  /* Font Families — Gravity trio */
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "DM Sans", -apple-system, system-ui, sans-serif;
+  --font-mono: "DM Mono", monospace;
+  --font-sans: "DM Sans", -apple-system, system-ui, sans-serif;
 
   /* Easing */
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
@@ -51,12 +95,13 @@
 
 /* Selection */
 ::selection {
-  background: var(--color-text);
-  color: var(--color-bg);
+  background: var(--color-accent);
+  color: #fff;
 }
 
 /* Base */
 html {
+  font-size: 14px;
   scroll-padding-top: 72px;
 }
 
@@ -78,28 +123,33 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(28, 28, 25, 0.2);
+  background: rgba(17, 17, 20, 0.15);
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(28, 28, 25, 0.4);
+  background: rgba(17, 17, 20, 0.3);
 }
 
 /* ─── Typography Utilities ──────────────────────────────────────────────── */
 .text-eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: 0.56rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
+  font-weight: 500;
   color: var(--color-text-secondary);
 }
 
+.font-serif {
+  font-family: var(--font-serif);
+}
+
 .tracking-tight-editorial {
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .tracking-wide-editorial {
-  letter-spacing: 0.15em;
+  letter-spacing: 0.08em;
 }
 
 /* ─── Layout Utilities ──────────────────────────────────────────────────── */
@@ -115,19 +165,19 @@ body {
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.02;
+  opacity: 0.018;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
 }
 
-/* ─── Row hover — subtle left-shift (editorial interaction) ─────────────── */
+/* ─── Row hover — subtle editorial interaction ─────────────── */
 .row-hover {
-  transition: padding-left 0.3s var(--ease-smooth), background-color 0.3s ease;
+  transition: padding-left 0.2s var(--ease-smooth), background-color 0.2s ease;
 }
 .row-hover:hover {
   padding-left: 4px;
-  background-color: rgba(28, 28, 25, 0.015);
+  background-color: rgba(42, 122, 91, 0.03);
 }
 
 /* ─── Pulsing dot ───────────────────────────────────────────────────────── */
@@ -136,12 +186,12 @@ body {
   50% { opacity: 1; }
 }
 .pulse-dot {
-  animation: pulse-dot 3s ease-in-out infinite;
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
 /* ─── Smooth transitions for interactive elements ───────────────────────── */
 button, a, [role="button"] {
-  transition: all 0.15s var(--ease-smooth);
+  transition: all 0.2s ease;
 }
 
 /* ─── Focus ring — accessible + editorial ───────────────────────────────── */
@@ -156,4 +206,18 @@ button, a, [role="button"] {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ─── Gravity-style mono label ──────────────────────────────────────────── */
+.gravity-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 900px) {
+  html { font-size: 13px; }
 }
