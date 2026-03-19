@@ -5,6 +5,10 @@
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  console.warn('⚠️ Supabase credentials missing — check your .env file');
+}
+
 // ── Auth helpers ─────────────────────────────────────────────────────────
 
 export const supabaseAuth = {

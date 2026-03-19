@@ -10,22 +10,35 @@ export default function AttentionBanner({ overdueTasks, overloadedMembers, proje
         <span className="text-sm font-bold text-amber-900">Needs Attention</span>
       </div>
       <div className="space-y-2">
-        {overdueTasks.slice(0, 3).map(task => {
+        {overdueTasks.map(task => {
           const proj = projects.find(p => p.id === task.projectId);
           return (
-            <div key={task.id} className="flex items-center justify-between text-sm">
+            <div key={task.id} className="flex items-center justify-between text-sm group">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0" />
                 <span className="font-medium text-stone-900">{task.title}</span>
                 {proj && <span className="text-stone-400">— {proj.name}</span>}
               </div>
-              <span className="text-xs text-stone-400 font-mono">
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={() => console.log('Reassign task:', task.id)}
+                  className="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-600 hover:text-indigo-800"
+                >
+                  Reassign
+                </button>
+                <button 
+                  onClick={() => console.log('Snooze task:', task.id)}
+                  className="text-[10px] font-mono font-bold uppercase tracking-wider text-stone-400 hover:text-stone-600"
+                >
+                  Snooze
+                </button>
+              </div>
+              <span className="text-xs text-stone-400 font-mono ml-3 group-hover:hidden">
                 {Array.isArray(task.assignedTo) ? task.assignedTo.join(', ') : task.assignedTo}
               </span>
             </div>
           );
         })}
-        {overdueTasks.length > 3 && <div className="text-xs text-amber-700 font-medium font-mono">+{overdueTasks.length - 3} more overdue</div>}
         {overloadedMembers.slice(0, 2).map(m => (
           <div key={m.name} className="flex items-center gap-2 text-sm">
             <span className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0" />
