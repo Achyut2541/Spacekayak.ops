@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fermi Ops — PM Audit Report</title>
+<style>
+  :root {
+    --ink: #111111;
+    --ink-2: #444444;
+    --ink-3: #888888;
+    --line: #e5e5e5;
+    --bg: #fafaf9;
+    --card: #ffffff;
+    --red: #c0392b;
+    --red-bg: #fff5f5;
+    --red-border: #fecaca;
+    --orange: #c2410c;
+    --orange-bg: #fff7ed;
+    --orange-border: #fed7aa;
+    --yellow: #92400e;
+    --yellow-bg: #fefce8;
+    --yellow-border: #fde68a;
+    --green: #166534;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --indigo: #3730a3;
+    --indigo-bg: #eef2ff;
+    --indigo-border: #c7d2fe;
+    --radius: 8px;
+    --radius-sm: 4px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* ── Header ── */
+  .report-header {
+    background: var(--ink);
+    color: white;
+    padding: 56px 64px 48px;
+  }
+  .report-header .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 12px;
+  }
+  .report-header h1 {
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .report-header h1 strong { font-weight: 700; }
+  .report-header .subtitle {
+    color: #aaa;
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+  }
+  .report-header .meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid #333;
+  }
+  .meta-item .label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #666; font-family: 'Courier New', monospace; margin-bottom: 4px; }
+  .meta-item .value { font-size: 13px; color: #e5e5e5; }
+
+  /* ── Layout ── */
+  .body-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 64px 96px;
+  }
+
+  /* ── Exec Summary ── */
+  .exec-summary {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+  .exec-summary .section-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-family: 'Courier New', monospace;
+    margin-bottom: 16px;
+  }
+  .exec-summary p { color: var(--ink-2); font-size: 14px; line-height: 1.8; margin-bottom: 12px; }
+  .exec-summary p:last-child { margin-bottom: 0; }
+
+  /* ── Score Cards ── */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  .score-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+  }
+  .score-card .area { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); font-family: 'Courier New', monospace; margin-bottom: 8px; }
+  .score-card .score { font-size: 36px; font-weight: 300; letter-spacing: -0.03em; line-height: 1; margin-bottom: 6px; }
+  .score-card .verdict { font-size: 11px; font-family: 'Courier New', monospace; }
+  .score-card.red .score { color: var(--red); }
+  .score-card.red .verdict { color: var(--red); }
+  .score-card.orange .score { color: var(--orange); }
+  .score-card.orange .verdict { color: var(--orange); }
+  .score-card.yellow .score { color: var(--yellow); }
+  .score-card.yellow .verdict { color: var(--yellow); }
+  .score-card.green .score { color: var(--green); }
+  .score-card.green .verdict { color: var(--green); }
+
+  /* ── Section Headers ── */
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .section-header .count {
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    color: var(--ink-3);
+  }
+  .section-wrap { margin-bottom: 48px; }
+
+  /* ── Issue Cards ── */
+  .issue {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .issue-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 18px 20px;
+  }
+  .severity-badge {
+    flex-shrink: 0;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-top: 2px;
+  }
+  .sev-p0 { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .sev-p1 { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); }
+  .sev-p2 { background: var(--yellow-bg); color: var(--yellow); border: 1px solid var(--yellow-border); }
+  .sev-p3 { background: var(--indigo-bg); color: var(--indigo); border: 1px solid var(--indigo-border); }
+
+  .issue-content { flex: 1; }
+  .issue-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .issue-loc {
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    color: var(--ink-3);
+    margin-bottom: 0;
+  }
+  .issue-body {
+    padding: 0 20px 18px 20px;
+    border-top: 1px solid var(--line);
+    background: #fafaf9;
+  }
+  .issue-body p { font-size: 13px; color: var(--ink-2); line-height: 1.7; padding-top: 14px; }
+  .code-block {
+    background: #1a1a1a;
+    color: #e5e5e5;
+    font-family: 'Courier New', monospace;
+    font-size: 11.5px;
+    line-height: 1.6;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-top: 10px;
+    overflow-x: auto;
+  }
+  .code-block .hl-red { color: #f87171; }
+  .code-block .hl-green { color: #86efac; }
+  .code-block .hl-yellow { color: #fde68a; }
+  .code-block .hl-gray { color: #6b7280; }
+
+  .fix-box {
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-top: 10px;
+  }
+  .fix-box .fix-label { font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); font-family: 'Courier New', monospace; margin-bottom: 4px; }
+  .fix-box p { font-size: 12px; color: #14532d; line-height: 1.6; padding-top: 0; }
+
+  /* ── Flow Diagram ── */
+  .flow-diagram {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+  .flow-diagram h3 { font-size: 13px; font-weight: 700; margin-bottom: 20px; color: var(--ink); }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 100px;
+    position: relative;
+  }
+  .flow-node {
+    width: 100%;
+    max-width: 120px;
+    background: var(--indigo-bg);
+    border: 1.5px solid var(--indigo-border);
+    border-radius: var(--radius-sm);
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--indigo);
+    line-height: 1.3;
+    position: relative;
+  }
+  .flow-node.broken {
+    background: var(--red-bg);
+    border-color: var(--red-border);
+    color: var(--red);
+  }
+  .flow-node.missing {
+    background: #f5f5f5;
+    border: 1.5px dashed #ccc;
+    color: #999;
+  }
+  .flow-node .node-badge {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+    background: var(--red);
+    color: white;
+    font-size: 8px;
+    font-weight: 800;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', monospace;
+  }
+  .flow-arrow {
+    font-size: 18px;
+    color: var(--ink-3);
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  .flow-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-3); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── Priority Matrix ── */
+  .matrix {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .matrix table { width: 100%; border-collapse: collapse; }
+  .matrix th {
+    background: #f5f5f4;
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-family: 'Courier New', monospace;
+    border-bottom: 1px solid var(--line);
+  }
+  .matrix td {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid #f5f5f4;
+    vertical-align: top;
+  }
+  .matrix tr:last-child td { border-bottom: none; }
+  .matrix .sprint { font-family: 'Courier New', monospace; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+  .matrix .tag { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 3px; font-family: 'Courier New', monospace; font-weight: 700; }
+
+  /* ── Role Map ── */
+  .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 32px; }
+  .role-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .role-card .role-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .role-card .role-id { font-size: 10px; font-family: 'Courier New', monospace; color: var(--ink-3); margin-bottom: 12px; }
+  .role-card .capability { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); margin-bottom: 4px; }
+  .cap-yes { color: #16a34a; font-weight: 800; }
+  .cap-no { color: #dc2626; font-weight: 800; }
+  .cap-broken { color: #d97706; font-weight: 800; }
+
+  /* ── Dashboard Anatomy ── */
+  .dashboard-anatomy {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .anatomy-panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .anatomy-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    font-weight: 700;
+    background: #f5f5f4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .anatomy-header .role-pill {
+    font-size: 9px;
+    font-family: 'Courier New', monospace;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  .pill-admin { background: var(--indigo-bg); color: var(--indigo); }
+  .pill-member { background: var(--yellow-bg); color: var(--yellow); }
+  .anatomy-section {
+    padding: 12px 18px;
+    border-bottom: 1px solid #f5f5f4;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .anatomy-section:last-child { border-bottom: none; }
+  .anat-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .anat-label { font-size: 12px; font-weight: 600; color: var(--ink); }
+  .anat-note { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .anat-holes { margin-top: 6px; }
+  .anat-hole { font-size: 10px; font-family: 'Courier New', monospace; color: var(--red); display: flex; align-items: flex-start; gap: 4px; margin-bottom: 2px; line-height: 1.4; }
+
+  /* ── Footer ── */
+  .report-footer {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    font-size: 11px;
+    color: var(--ink-3);
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<div class="report-header">
+  <div class="eyebrow">PM Audit Report · Fermi Operations</div>
+  <h1>You have a <strong>broken identity layer</strong><br>and seven dashboard holes.</h1>
+  <div class="subtitle">Spacekayak.ops · React 19 + Vite + Supabase · reviewed March 2026</div>
+  <div class="meta">
+    <div class="meta-item"><div class="label">Reviewer role</div><div class="value">PM (Microsoft framing)</div></div>
+    <div class="meta-item"><div class="label">Files read</div><div class="value">21 source files</div></div>
+    <div class="meta-item"><div class="label">P0 blockers</div><div class="value">2 (shipping-blocking)</div></div>
+    <div class="meta-item"><div class="label">Total issues</div><div class="value">16 across 4 categories</div></div>
+  </div>
+</div>
+
+<div class="body-wrap">
+
+  <!-- ═══════════ EXEC SUMMARY ═══════════ -->
+  <div class="exec-summary">
+    <div class="section-label">Executive Summary</div>
+    <p>Fermi Ops is well-architected at the surface — clean context separation, good component boundaries, smart workload calculations. But the auth-to-identity pipeline is broken at the core: <strong>every user who logs in sees Achyut's dashboard</strong>, because <code>currentUser</code> is hardcoded to <code>'Achyut'</code> and never derived from the authenticated email. This is a P0 blocker that makes the entire role-based dashboard system non-functional for any real user.</p>
+    <p>Beyond that, the dashboard has structural gaps at both the manager and team-member layers — missing loading states, a duplicated "Due This Week" section, a bypassed hours-logging prompt, and stat cards with no drill-down. The Settings page is also wired wrong and will silently fail on every Basecamp sync click. These are all fixable in one tight sprint.</p>
+  </div>
+
+  <!-- ═══════════ SCORE CARDS ═══════════ -->
+  <div class="score-grid">
+    <div class="score-card red">
+      <div class="area">Auth / Identity</div>
+      <div class="score">2/10</div>
+      <div class="verdict">BROKEN</div>
+    </div>
+    <div class="score-card orange">
+      <div class="area">Onboarding Flow</div>
+      <div class="score">4/10</div>
+      <div class="verdict">INCOMPLETE</div>
+    </div>
+    <div class="score-card yellow">
+      <div class="area">Dashboard Logic</div>
+      <div class="score">6/10</div>
+      <div class="verdict">PATCHY</div>
+    </div>
+    <div class="score-card green">
+      <div class="area">Architecture</div>
+      <div class="score">8/10</div>
+      <div class="verdict">SOLID</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ONBOARDING FLOW ═══════════ -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Onboarding Flow</h2>
+      <span class="count">as-built vs. what's needed</span>
+    </div>
+
+    <div class="flow-diagram">
+      <h3>Current flow (what actually happens)</h3>
+      <div class="flow-row">
+        <div class="flow-step">
+          <div class="flow-node">User visits app</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node">AuthScreen<br/>(login only)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node broken">Supabase<br/>auth OK<br/><span class="node-badge">!</span></div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node broken">currentUser<br/>= "Achyut"<br/><span class="node-badge">!</span></div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node broken">Wrong<br/>dashboard<br/><span class="node-badge">!</span></div>
+        </div>
+      </div>
+      <div class="flow-legend" style="margin-top:20px;">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--indigo-bg);border:1.5px solid var(--indigo-border);"></div> Works</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red-bg);border:1.5px solid var(--red-border);"></div> Broken</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f5f5f5;border:1.5px dashed #ccc;"></div> Missing entirely</div>
+      </div>
+    </div>
+
+    <div class="flow-diagram">
+      <h3>What the flow should look like</h3>
+      <div class="flow-row">
+        <div class="flow-step">
+          <div class="flow-node">Login / Invite<br/>link</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node">Supabase<br/>auth OK</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node">Email → name<br/>lookup</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node">Role resolved<br/>(admin/am/member)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node missing">1st-time<br/>welcome?</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">
+          <div class="flow-node">Correct<br/>dashboard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ P0 / P1 ISSUES ═══════════ -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Critical Issues</h2>
+      <span class="count">2 P0 · 3 P1</span>
+    </div>
+
+    <!-- P0-1 -->
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p0">P0 · Blocker</div>
+        <div class="issue-content">
+          <div class="issue-title">currentUser is hardcoded to "Achyut" — every user sees the wrong dashboard</div>
+          <div class="issue-loc">src/contexts/AuthContext.jsx · line 12</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p>After a successful Supabase login, <code>currentUser</code> is never updated to match the authenticated email. The state initialises as <code>'Achyut'</code> and stays there. This means Navaneeth logs in with <code>navaneeth@spacekayak.xyz</code>, passes auth, and then lands on Achyut's manager dashboard with full admin access in the UI. The entire role-based split between manager view and team-member view is broken for all real users.</p>
+        <div class="code-block">
+<span class="hl-gray">// AuthContext.jsx — the problem</span>
+<span class="hl-red">const [currentUser, setCurrentUser] = useState('Achyut');  // ← hardcoded</span>
+
+<span class="hl-gray">// login() — email stored but never mapped to a name</span>
+const login = async (email, password) => {
+  const { data, error } = await supabaseAuth.signIn(email, password);
+  <span class="hl-red">// setCurrentUser is never called here</span>
+  localStorage.setItem('sk_auth_email', email);
+  ...
+};
+        </div>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>After login resolves, look up the email in <code>teamMembers</code> (or pass it through the auth payload) and call <code>setCurrentUser(matched.name)</code>. Since DataContext loads after AuthContext, do this lookup in a <code>useEffect</code> inside DataProvider once <code>dataLoaded</code> is true, or store the email and resolve it lazily. Also fix the <code>restore()</code> session function the same way — it reads email from localStorage but never resolves it to a name.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- P0-2 -->
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p0">P0 · Blocker</div>
+        <div class="issue-content">
+          <div class="issue-title">Settings page is wired to a prop that is never passed — Basecamp sync silently fails</div>
+          <div class="issue-loc">src/components/settings/SettingsView.jsx · src/components/layout/AppShell.jsx</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p><code>SettingsView</code> receives a <code>syncEngine</code> prop and gates the sync button on <code>if (!syncEngine) return</code>. But <code>AppShell</code> renders <code>&lt;TabRouter /&gt;</code> which renders <code>&lt;SettingsView /&gt;</code> with no props — <code>syncEngine</code> is always <code>undefined</code>. Clicking "Sync Now" does nothing and no error is shown. Any user who tries to connect Basecamp will think it's broken with no feedback.</p>
+        <div class="code-block">
+<span class="hl-gray">// SettingsView.jsx</span>
+const handleSync = async () => {
+  <span class="hl-red">if (!syncEngine) return;  // ← always returns, syncEngine is never provided</span>
+  ...
+};
+
+<span class="hl-gray">// TabRouter in App.jsx — no prop passed</span>
+case 'settings': return <span class="hl-red">&lt;SettingsView /&gt;</span>;
+        </div>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Either instantiate <code>syncEngine</code> in <code>DataContext</code> and expose it via the context (cleanest), or instantiate it in <code>App.jsx</code> and thread it through the component tree. Also add a visible error state when <code>syncEngine</code> is null rather than silently swallowing the click.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- P1-1 -->
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p1">P1 · High</div>
+        <div class="issue-content">
+          <div class="issue-title">Leadership role (Paul, Saaket) is hardcoded in DataContext but they have no email → they can never log in</div>
+          <div class="issue-loc">src/contexts/DataContext.jsx · src/data/seed.js</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p>Paul and Saaket are assigned <code>'leadership'</code> sysRole directly in the <code>userRoles</code> memo inside DataContext, but they don't exist in <code>SEED_TEAM</code> and have no email address. <code>canViewAllProjects</code> grants them read-only access to all projects, but they can never actually authenticate because there is no Supabase user record for them. This role is dead code today, and if you ever want real leadership visibility, you'll need to add them as team members with proper emails.</p>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Add Paul and Saaket to <code>SEED_TEAM</code> with their <code>@spacekayak.xyz</code> emails and <code>sysRole: 'leadership'</code>. Remove the hardcoded entries from the DataContext memo — roles should always come from the team member record, not from scattered constants.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- P1-2 -->
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p1">P1 · High</div>
+        <div class="issue-content">
+          <div class="issue-title">No signup flow in the UI — new team members can't onboard themselves</div>
+          <div class="issue-loc">src/components/auth/AuthScreen.jsx</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p><code>AuthContext</code> has a fully implemented <code>signup()</code> function, but <code>AuthScreen</code> never surfaces it. The only path in is login + forgot password. To add a new team member today, someone has to manually create a Supabase user in the dashboard AND add a row to <code>SEED_TEAM</code> / the DB. This creates an ops burden every time you onboard someone new. Even an invite-only flow (admin sends invite link, user sets password) would eliminate this.</p>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Add an invite-based onboarding: admin enters email in Settings → Supabase sends magic link → user lands on a set-password screen → they're dropped into their correct dashboard. Use <code>signup()</code> which is already wired. The domain restriction (<code>@spacekayak.xyz</code>) is already enforced client-side — keep it but also enforce server-side via Supabase email templates.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- P1-3 -->
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p1">P1 · High</div>
+        <div class="issue-content">
+          <div class="issue-title">No loading state during the 4-second Supabase boot timeout — users see a blank screen</div>
+          <div class="issue-loc">src/contexts/DataContext.jsx · boot() function</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p><code>DataContext</code> has a <code>dataLoaded</code> flag that correctly starts as <code>false</code> and is set to <code>true</code> after the Supabase boot. But the app renders children immediately — <code>AppShell</code>, <code>DashboardView</code>, etc. — without checking <code>dataLoaded</code>. Users see the full UI shell with seed data for up to 4 seconds before real data arrives, then the view silently re-renders. If the Supabase load is slow or fails, there's no visible feedback at all.</p>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Consume <code>dataLoaded</code> in <code>AuthGate</code> or <code>AppShell</code> and render a skeleton layout until it's true. The <code>Skeleton</code> UI component already exists in <code>src/components/ui/Skeleton.jsx</code> — wire it up. Also surface a toast or inline error when Supabase times out rather than silently falling back to seed data.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ DASHBOARD HOLES ═══════════ -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Dashboard Holes — Per Role</h2>
+      <span class="count">anatomy of what's built vs. what's missing</span>
+    </div>
+
+    <div class="dashboard-anatomy">
+      <!-- Manager -->
+      <div class="anatomy-panel">
+        <div class="anatomy-header">
+          Manager / Admin View
+          <span class="role-pill pill-admin">admin · am</span>
+        </div>
+        <div class="anatomy-section">
+          <div class="anat-icon">📊</div>
+          <div>
+            <div class="anat-label">Stats Bar (4 KPIs)</div>
+            <div class="anat-note">Active Projects · Overdue · Due This Week · Team Overloaded</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ No click-through — all 4 cards are dead</div>
+              <div class="anat-hole">⚠ "Due This Week" counts all tasks, not just ones for the filtered person</div>
+            </div>
+          </div>
+        </div>
+        <div class="anatomy-section">
+          <div class="anat-icon">🚨</div>
+          <div>
+            <div class="anat-label">Attention Banner</div>
+            <div class="anat-note">Overdue tasks + overloaded members</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ Truncates at 3 tasks with no expand/modal</div>
+              <div class="anat-hole">⚠ No action button — can't reassign or snooze from here</div>
+            </div>
+          </div>
+        </div>
+        <div class="anatomy-section">
+          <div class="anat-icon">🗂</div>
+          <div>
+            <div class="anat-label">Portfolio Health (project cards)</div>
+            <div class="anat-note">Expandable rows with tasks, progress, days left</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ No AM name shown per project — can't tell who owns what at a glance</div>
+              <div class="anat-hole">⚠ "Show Archived" is gated to canEditProjects (admin only) — AMs can't see archived</div>
+              <div class="anat-hole">⚠ filterByPerson state doesn't persist across tab switches</div>
+            </div>
+          </div>
+        </div>
+        <div class="anatomy-section">
+          <div class="anat-icon">👤</div>
+          <div>
+            <div class="anat-label">View As switcher (header)</div>
+            <div class="anat-note">Admin can impersonate any team member</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ viewingAs + currentUser can be set simultaneously — ambiguous state</div>
+              <div class="anat-hole">⚠ No audit log — no record that impersonation happened</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Member -->
+      <div class="anatomy-panel">
+        <div class="anatomy-header">
+          Team Member View
+          <span class="role-pill pill-member">team_member</span>
+        </div>
+        <div class="anatomy-section">
+          <div class="anat-icon">✅</div>
+          <div>
+            <div class="anat-label">Your Active Tasks</div>
+            <div class="anat-note">Sorted by status priority, shows project name + due date</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ completeTask() bypasses needsHoursLog check — hours never get logged from dashboard</div>
+              <div class="anat-hole">⚠ "for-review" and "client-delay" statuses missing from inline badge — show as blank</div>
+              <div class="anat-hole">⚠ No link to project detail — no way to get context</div>
+            </div>
+          </div>
+        </div>
+        <div class="anatomy-section">
+          <div class="anat-icon">📅</div>
+          <div>
+            <div class="anat-label">Due This Week</div>
+            <div class="anat-note">Tasks due within 7 days with color-coded urgency</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ Duplicates tasks already shown in Active Tasks — redundant section for most users</div>
+              <div class="anat-hole">⚠ No "Due Next Week" lookahead — no planning horizon</div>
+            </div>
+          </div>
+        </div>
+        <div class="anatomy-section">
+          <div class="anat-icon">📁</div>
+          <div>
+            <div class="anat-label">Your Projects</div>
+            <div class="anat-note">Project health dot + progress bar + phase badge</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ No team visibility — can't see who else is on the project</div>
+              <div class="anat-hole">⚠ No capacity self-view — member can't see their own load percentage</div>
+              <div class="anat-hole">⚠ No empty state guidance for new users with 0 tasks assigned</div>
+            </div>
+          </div>
+        </div>
+        <div class="anatomy-section" style="background:#fff5f5;border-left:3px solid var(--red);">
+          <div class="anat-icon">🔴</div>
+          <div>
+            <div class="anat-label" style="color:var(--red);">Identity bug (P0)</div>
+            <div class="anat-note" style="color:var(--red);">effectiveUser = viewingAs || currentUser — currentUser is always "Achyut"</div>
+            <div class="anat-holes">
+              <div class="anat-hole">⚠ Every real user sees this view populated with Achyut's tasks, not their own</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard issues continued -->
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p1">P1 · High</div>
+        <div class="issue-content">
+          <div class="issue-title">completeTask() on the dashboard bypasses the hours-logging prompt entirely</div>
+          <div class="issue-loc">src/components/dashboard/DashboardView.jsx · completeTask()</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p><code>updateTask()</code> in DataContext returns <code>{ needsHoursLog: true }</code> when a task is being completed without actual hours logged. <code>TasksView</code> correctly handles this and shows a modal. But <code>DashboardView</code>'s <code>completeTask()</code> ignores the return value — it calls <code>updateTask(taskId, { status: 'completed' })</code> and discards the result. This means every task completed from the dashboard skips actual hours collection, corrupting your historical estimation accuracy data.</p>
+        <div class="code-block">
+<span class="hl-gray">// DashboardView — ignores the return value</span>
+const completeTask = (taskId, projectId) => {
+  <span class="hl-red">updateTask(taskId, { status: 'completed' });  // returns { needsHoursLog: true } — ignored</span>
+  ...
+};
+
+<span class="hl-gray">// TasksView — correctly handles it</span>
+const result = updateTask(taskId, { status: 'completed' });
+<span class="hl-green">if (result.needsHoursLog) setLoggingHoursTask(taskId);</span>
+        </div>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Mirror the TasksView pattern: capture the return value of <code>updateTask</code> and if <code>needsHoursLog</code> is true, call <code>setLoggingHoursTask(taskId)</code> from UIContext. The <code>LogHoursModal</code> is already built — it just needs to be triggered from here too.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p2">P2 · Medium</div>
+        <div class="issue-content">
+          <div class="issue-title">Sidebar "Team" nav item is duplicated for admin users</div>
+          <div class="issue-loc">src/components/layout/Sidebar.jsx · items construction</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p>"Team" appears in the <code>NAV_ITEMS</code> constant AND is appended again via <code>canEditProjects(currentUser)</code> check. Admins see two "Team" entries in the sidebar. This is a simple logic error — the nav item array shouldn't contain "team" in the static list if it's being conditionally added.</p>
+        <div class="code-block">
+<span class="hl-gray">// NAV_ITEMS already contains team...</span>
+{ id: 'team', icon: Users, label: 'Team', showCount: 'team' },  <span class="hl-red">// ← here</span>
+
+<span class="hl-gray">// ...then it gets added again:</span>
+const items = [
+  ...NAV_ITEMS,
+  <span class="hl-red">...(canEditProjects(currentUser) ? [{ id: 'team', ... }] : []),</span>
+];
+        </div>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Remove the "team" entry from <code>NAV_ITEMS</code> and keep only the conditional version, or flip the logic — include it in NAV_ITEMS and filter it out for non-admins.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p2">P2 · Medium</div>
+        <div class="issue-content">
+          <div class="issue-title">Search bar only filters projects — tasks, people, and phases are invisible to search</div>
+          <div class="issue-loc">src/components/dashboard/DashboardView.jsx · searchQuery filter</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p>The global search in the header sets <code>searchQuery</code> in UIContext, but only <code>DashboardView</code> consumes it, and only to filter project names and types. Searching "Navaneeth" returns nothing. Searching "QA" returns nothing. The mental model the search bar implies — global, cross-entity search — is completely unmet by the current implementation.</p>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Either scope the search bar clearly (rename it "Search projects…") or expand the implementation to search tasks by title/assignee and team members by name. Given you already have a tasks view and team view, a simple client-side filter function would cover 90% of use cases.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p2">P2 · Medium</div>
+        <div class="issue-content">
+          <div class="issue-title">"Due This Week" in team member view duplicates what's already in "Active Tasks" above it</div>
+          <div class="issue-loc">src/components/dashboard/DashboardView.jsx · team member return block</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p><code>myThisWeek</code> is filtered from <code>myActiveTasks</code> — so every task in the "Due This Week" panel was already rendered in "Active Tasks" directly above it. For most team members with &lt;10 tasks, this creates a visually confusing double-listing with no incremental value. The section earns its place only if it shows tasks the first section doesn't — like tasks from other contexts, or tasks where someone else is primary.</p>
+        <div class="fix-box">
+          <div class="fix-label">Fix</div>
+          <p>Either remove "Due This Week" from the team member view and keep it as a manager-only summary, or repurpose it to show tasks not yet in the active list (status: 'backlog' but due this week). The "next week" equivalent — a planning horizon — would be more useful than repeating the same tasks.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="issue">
+      <div class="issue-header">
+        <div class="severity-badge sev-p3">P3 · Low</div>
+        <div class="issue-content">
+          <div class="issue-title">No real-time Supabase subscriptions — concurrent users will see stale data</div>
+          <div class="issue-loc">src/contexts/DataContext.jsx</div>
+        </div>
+      </div>
+      <div class="issue-body">
+        <p>Supabase offers <code>supabase.channel().on('postgres_changes', ...)</code> for real-time updates. Currently, data is only fetched once on boot and then mutated locally. If Achyut marks a task delayed while Hari is viewing the same project, Hari sees nothing until they refresh. For an ops tool used concurrently by 15+ people, this is a meaningful gap — especially for the Attention Banner which is supposed to surface urgent items.</p>
+        <div class="fix-box">
+          <div class="fix-label">Fix (Sprint 2)</div>
+          <p>Add Supabase realtime subscriptions to projects and tasks tables in <code>DataContext</code>. The debounced auto-save pattern already in place will handle conflicts gracefully. This is a nice-to-have for now but becomes critical as team size grows.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ ROLE MAP ═══════════ -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Role Capability Map</h2>
+      <span class="count">what each role can actually do today</span>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-name">Admin (Achyut)</div>
+        <div class="role-id">sysRole: 'admin' · pixel@spacekayak.xyz</div>
+        <div class="capability"><span class="cap-yes">✓</span> See all projects & tasks</div>
+        <div class="capability"><span class="cap-yes">✓</span> Edit / archive projects</div>
+        <div class="capability"><span class="cap-yes">✓</span> View As any team member</div>
+        <div class="capability"><span class="cap-yes">✓</span> Switch profile (other AMs)</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Basecamp sync (prop missing)</div>
+        <div class="capability"><span class="cap-yes">✓</span> Slack notifications</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Account Manager</div>
+        <div class="role-id">sysRole: 'am' · Hari, Neel</div>
+        <div class="capability"><span class="cap-yes">✓</span> See all projects & tasks</div>
+        <div class="capability"><span class="cap-yes">✓</span> Edit / archive projects</div>
+        <div class="capability"><span class="cap-yes">✓</span> View As any team member</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Can't see archived (wrong gate)</div>
+        <div class="capability"><span class="cap-no">✗</span> Can't switch profile</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Lands on Achyut's dashboard (P0)</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Leadership</div>
+        <div class="role-id">sysRole: 'leadership' · Paul, Saaket</div>
+        <div class="capability"><span class="cap-no">✗</span> Can't log in (no email in DB)</div>
+        <div class="capability"><span class="cap-no">✗</span> Role is dead code</div>
+        <div class="capability"><span class="cap-no">✗</span> Not in SEED_TEAM</div>
+        <div class="capability"><span class="cap-no">✗</span> Can't edit projects</div>
+        <div class="capability"><span class="cap-no">✗</span> Would see all projects (if fixed)</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Design Team</div>
+        <div class="role-id">sysRole: 'team_member' · 8 people</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Lands on Achyut's dashboard (P0)</div>
+        <div class="capability"><span class="cap-no">✗</span> Can't see other projects</div>
+        <div class="capability"><span class="cap-no">✗</span> Can't see own capacity</div>
+        <div class="capability"><span class="cap-no">✗</span> Can't see teammates on project</div>
+        <div class="capability"><span class="cap-yes">✓</span> Can update task status</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Hours logging bypassed</div>
+      </div>
+      <div class="role-card">
+        <div class="role-name">Dev Team</div>
+        <div class="role-id">sysRole: 'team_member' · 5 people</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Lands on Achyut's dashboard (P0)</div>
+        <div class="capability"><span class="cap-no">✗</span> Can't see other projects</div>
+        <div class="capability"><span class="cap-no">✗</span> No dev-specific task view</div>
+        <div class="capability"><span class="cap-yes">✓</span> Can update task status</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Hours logging bypassed</div>
+      </div>
+      <div class="role-card" style="border-style:dashed;">
+        <div class="role-name" style="color:var(--ink-3);">Extended Team</div>
+        <div class="role-id">Boris, Arina · maxProjects: 1</div>
+        <div class="capability"><span class="cap-broken">⚠</span> Same P0 as team_member</div>
+        <div class="capability"><span class="cap-yes">✓</span> Lower maxProjects limit set</div>
+        <div class="capability"><span class="cap-no">✗</span> No UI distinction vs full team</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ PRIORITY MATRIX ═══════════ -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>Fix Priority Matrix</h2>
+      <span class="count">recommended sprint sequencing</span>
+    </div>
+    <div class="matrix">
+      <table>
+        <thead>
+          <tr>
+            <th>Sprint</th>
+            <th>Issue</th>
+            <th>Effort</th>
+            <th>Impact</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="sprint">Sprint 1</td>
+            <td><strong>Resolve currentUser from auth email post-login</strong></td>
+            <td>~3h</td>
+            <td>Unblocks every non-admin user</td>
+            <td><span class="tag sev-p0">P0 · Auth</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 1</td>
+            <td><strong>Pass syncEngine to SettingsView (via context)</strong></td>
+            <td>~1h</td>
+            <td>Fixes Basecamp sync silently failing</td>
+            <td><span class="tag sev-p0">P0 · Settings</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 1</td>
+            <td><strong>Add Paul + Saaket to SEED_TEAM with emails</strong></td>
+            <td>~30m</td>
+            <td>Enables leadership logins</td>
+            <td><span class="tag sev-p1">P1 · Auth</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 1</td>
+            <td><strong>Wire needsHoursLog in DashboardView completeTask()</strong></td>
+            <td>~1h</td>
+            <td>Fixes data integrity on hours logging</td>
+            <td><span class="tag sev-p1">P1 · Dashboard</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 1</td>
+            <td><strong>Show dataLoaded skeleton (use existing Skeleton.jsx)</strong></td>
+            <td>~2h</td>
+            <td>No more blank-then-flash on boot</td>
+            <td><span class="tag sev-p1">P1 · UX</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 2</td>
+            <td><strong>Deduplicate "Team" in Sidebar nav items array</strong></td>
+            <td>~15m</td>
+            <td>Fixes double nav item for admins</td>
+            <td><span class="tag sev-p2">P2 · UI</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 2</td>
+            <td><strong>Fix "Show Archived" gate from admin-only → admin+AM</strong></td>
+            <td>~15m</td>
+            <td>AMs can see archived projects</td>
+            <td><span class="tag sev-p2">P2 · Roles</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 2</td>
+            <td><strong>Add "for-review" + "client-delay" to team member badge</strong></td>
+            <td>~30m</td>
+            <td>Status labels no longer blank</td>
+            <td><span class="tag sev-p2">P2 · Dashboard</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 2</td>
+            <td><strong>Rework "Due This Week" — deduplicate or repurpose as next-week lookahead</strong></td>
+            <td>~2h</td>
+            <td>Removes confusing duplicate task display</td>
+            <td><span class="tag sev-p2">P2 · Dashboard</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 2</td>
+            <td><strong>Add AM name label to Portfolio Health cards</strong></td>
+            <td>~30m</td>
+            <td>Manager can see ownership at a glance</td>
+            <td><span class="tag sev-p2">P2 · Dashboard</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 2</td>
+            <td><strong>Make stat cards clickable (link to filtered view)</strong></td>
+            <td>~2h</td>
+            <td>Stats become actionable, not decorative</td>
+            <td><span class="tag sev-p2">P2 · Dashboard</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 3</td>
+            <td><strong>Build invite-based onboarding flow (use existing signup())</strong></td>
+            <td>~1 day</td>
+            <td>Removes manual Supabase admin burden</td>
+            <td><span class="tag sev-p1">P1 · Onboarding</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 3</td>
+            <td><strong>Scope or expand global search (placeholder vs. reality)</strong></td>
+            <td>~3h</td>
+            <td>Search works as expected</td>
+            <td><span class="tag sev-p2">P2 · UX</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Sprint 3</td>
+            <td><strong>Add capacity self-view to team member dashboard</strong></td>
+            <td>~3h</td>
+            <td>Team members understand their own load</td>
+            <td><span class="tag sev-p3">P3 · Dashboard</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Backlog</td>
+            <td><strong>Add Supabase realtime subscriptions for projects + tasks</strong></td>
+            <td>~1 day</td>
+            <td>Multi-user consistency</td>
+            <td><span class="tag sev-p3">P3 · Infra</span></td>
+          </tr>
+          <tr>
+            <td class="sprint">Backlog</td>
+            <td><strong>Audit trail for "View As" impersonation</strong></td>
+            <td>~2h</td>
+            <td>Compliance / trust</td>
+            <td><span class="tag sev-p3">P3 · Auth</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════ WHAT'S ACTUALLY GOOD ═══════════ -->
+  <div class="section-wrap">
+    <div class="section-header">
+      <h2>What's Actually Strong</h2>
+      <span class="count">don't touch these</span>
+    </div>
+    <div class="exec-summary">
+      <div class="section-label">Things working well</div>
+      <p><strong>Context architecture is clean.</strong> Separating Auth, Data, and UI into three discrete contexts is the right call. DataContext doesn't bleed into AuthContext, UIContext doesn't hold business logic. This is exactly how a well-structured React app should be organized.</p>
+      <p><strong>The workload/capacity engine is sophisticated.</strong> <code>getWorkload()</code>, <code>capacityPct()</code>, <code>assessTaskRisk()</code>, and <code>suggestReassignment()</code> are genuinely useful calculations. This is the core IP of the product and it's well-implemented.</p>
+      <p><strong>Debounced auto-save to Supabase is elegant.</strong> Rather than saving on every keystroke or requiring manual saves, the 1.5-2s debounce pattern keeps the DB in sync transparently. Keep it exactly as-is.</p>
+      <p><strong>Slack integration with typed payloads is production-ready.</strong> <code>buildTaskAssignedPayload</code> and <code>buildTaskDelayedPayload</code> are well-structured. The toast confirmation is a good UX touch. This is shippable today.</p>
+      <p><strong>The Crisis Navigator concept is unique.</strong> Playbooks + comms templates + scope/timeline/budget trade-off sliders is a genuinely differentiated feature. Once the auth layer is fixed, this alone is worth the whole tool.</p>
+    </div>
+  </div>
+
+  <div class="report-footer">
+    <span>Fermi Ops · PM Audit · March 2026</span>
+    <span>16 issues · 2 P0 · 3 P1 · 6 P2 · 3 P3</span>
+  </div>
+
+</div>
+</body>
+</html>
